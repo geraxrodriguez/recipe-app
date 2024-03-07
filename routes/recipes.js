@@ -11,6 +11,8 @@ const { ensureAuth } = require("../middleware/auth");
 router.get("/:id", ensureAuth, recipesController.getRecipe);
 
 // Enables user to create recipe w/ cloudinary for media uploads
+router.post("/favoriteRecipe/:id", recipesController.favoriteRecipe);
+
 router.post("/createRecipe", upload.single("file"), recipesController.createRecipe);
 
 //Enables user to like recipe. In controller, uses RECIPE model to update likes by 1

@@ -1,5 +1,6 @@
 const cloudinary = require("../middleware/cloudinary");
 const Recipe = require("../models/Recipe");
+const Favorite = require("../models/Favorite");
 
 module.exports = {
   getProfile: async (req, res) => {
@@ -10,6 +11,19 @@ module.exports = {
       const recipes = await Recipe.find({ user: req.user.id });
       //Sending recipe data from mongodb and user data to ejs template
       res.render("profile.ejs", { recipes: recipes, user: req.user });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  getFavorites: async (req, res) => {
+    try {
+      //Since we have a session each request (req) contains the logged-in users info: req.user
+      //Grabbing just the recipes of the logged-in user
+      //Console.log (req.user) to see everything
+      const recipes = await Favorite.find({ user: req.user.id }).populate('recipe');
+      console.log(recipes)
+      //Sending recipe data from mongodb and user data to ejs template
+      res.render("favorites.ejs", { recipes: recipes, user: req.user });
     } catch (err) {
       console.log(err);
     }
@@ -52,6 +66,20 @@ module.exports = {
       });
       console.log("Recipe has been added!");
       res.redirect("/profile");
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  favoriteRecipe: async (req, res) => {
+    try {
+
+      //media stored on cloudinary - above request responds with url and the media id that you will need when deleting content
+      await Favorite.create({
+        user: req.user.id,
+        recipe: req.params.id,
+      });
+      console.log("Recipe has been added!");
+      res.redirect(`/recipe/${req.params.id}`);
     } catch (err) {
       console.log(err);
     }
